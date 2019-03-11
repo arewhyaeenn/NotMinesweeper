@@ -11,6 +11,7 @@ import tkMessageBox
 from PlayButton import PlayButton
 from GameBoard import GameBoard
 from DifficultyButton import DifficultyButton
+from StatusBar import StatusBar
 
 
 class BombMopper:
@@ -60,7 +61,19 @@ class BombMopper:
         # initialize board
         self.board = GameBoard(self)
 
+        # initialize status bar
+        self.statusBar = StatusBar(self)
+        self.statusBar.packContents()
+        self.window.update()
+        self.statusBar.deactivate()
+
+        # allow quitting without errors
+        self.window.protocol('WM_DELETE_WINDOW', self.setInactive)
         self.isActive = True
+
+    # for use by quit button; mainloop ends when self.isActive is False
+    def setInactive(self):
+        self.isActive = False
 
     # transition from opening screen (with play button) to difficulty selection
     def selectDifficulty(self):
@@ -85,6 +98,10 @@ class BombMopper:
         # start game board
         self.board.activate(gridSize, nBombs)
 
+        # place status frame, turn on status bar
+        self.statusFrame.pack(side=TOP)
+        self.statusBar.activate()
+
     # reset size of canvas (for use after game a game ends)
     def resizeCanvasToDefault(self):
         self.resizeCanvas(self.defaultCanvasHeight, self.defaultCanvasWidth)
@@ -97,15 +114,6 @@ class BombMopper:
             width=self.canvasWidth,
             height=self.canvasHeight
         )
-
-    # keep displays up to date; run continuously
-    # buttons run callbacks which update parameters of window / canvas
-    # display is updated to match parameters when mainloop runs
-    def mainloop(self):
-        while self.isActive:
-            self.window.update()
-            self.canvas.update()
-        self.window.destroy()
 
     # run win/lose dialogue with win message
     def winGame(self):
@@ -124,12 +132,22 @@ class BombMopper:
     def winLosePopup(self, message):
         result = tkMessageBox.askquestion(message, "Keep Playing?")
         if result == "yes":
-            self.board.reset()
+            self.statusBar.deactivate()
             self.resizeCanvasToDefault()
             self.canvas.delete('all')
+            self.board.reset()
             self.playButton.activate()
         else:
             self.isActive = False
+
+    # keep displays up to date; run continuously
+    # buttons run callbacks which update parameters of window / canvas
+    # display is updated to match parameters when mainloop runs
+    def mainloop(self):
+        while self.isActive:
+            self.window.update()
+            self.canvas.update()
+        self.window.destroy()
 
 
 # main method (i.e. entry point when run)

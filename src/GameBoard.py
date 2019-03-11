@@ -18,6 +18,7 @@ class GameBoard:
 
         # hierarchy
         self.master = master  # master is BombMopper instance
+        self.statusBar = None  # status bar is constructed after GameBoard; it will call setStatusBar (below)
 
         # board fields
         self.gridSize = None
@@ -51,6 +52,9 @@ class GameBoard:
             'mightnight blue',
             'black'
         ]
+
+    def setStatusBar(self, bar):
+        self.statusBar = bar
 
     # sets up grid, does not place mines
     def activate(self, gridSize, nBombs):
@@ -123,6 +127,14 @@ class GameBoard:
         # if player has cleared all safe spaces, win game
         if self.nSafeCoords == 0:
             self.master.winGame()
+
+    def incrementFlags(self):
+        self.nFlags += 1
+        self.statusBar.updateText()
+
+    def decrementFlags(self):
+        self.nFlags -= 1
+        self.statusBar.updateText()
 
     # remove keybinds on all buttons
     def unbindButtons(self):

@@ -28,6 +28,11 @@ class BombButton:
         # create button
         self.button = Button(
             self.canvas,
+            bg='blue',
+            fg='blue',
+            # activebackground='black',
+            # activeforeground='black'
+            highlightbackground='gray'
         )
 
         # bind button clicks to start the game
@@ -117,6 +122,10 @@ class BombButton:
         self.button.config(
             image=self.board.buttonImages[self.buttonState]
         )
+        if self.buttonState == 1:
+            self.board.incrementFlags()
+        elif self.buttonState == 2:
+            self.board.decrementFlags()
 
     # when a button is clicked initially, tell GameBoard instance to start the game
     # then, reveal the spot that was clicked
